@@ -1,0 +1,441 @@
+<title>Rol da ANS × CMED</title>
+<style>
+/* ---------------------------------------------------------- tokens: tema claro */
+:root{
+  --ground:#F4F7FB;      --surface:#FFFFFF;     --surface-2:#EDF2F9;
+  --line:#D3DEEC;        --line-soft:#E4EBF5;
+  --ink:#0B1226;         --ink-2:#3A4C68;       --ink-3:#6B7E9B;
+  --navy:#0A1432;
+  --accent:#00708A;      --accent-soft:#E0F2F6; --accent-line:#0095AC;
+  --ouro:#9A6B00;        --ouro-soft:#FBF0D8;   --ouro-line:#F0B228;
+  --chip:#EDF2F9;        --chip-ink:#3A4C68;
+  --shadow:0 1px 2px rgba(10,20,50,.06), 0 8px 24px rgba(10,20,50,.06);
+  --focus:#0095AC;
+
+  --display:"Bahnschrift","DIN Alternate","Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;
+  --body:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"Cascadia Mono","Consolas",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#070E22;    --surface:#0C1730;     --surface-2:#101F3F;
+    --line:#1E3157;      --line-soft:#182848;
+    --ink:#EAF3FF;       --ink-2:#B3C6E0;       --ink-3:#7F94B4;
+    --navy:#0A1432;
+    --accent:#3EE6F5;    --accent-soft:#0B2C3C; --accent-line:#00E0F0;
+    --ouro:#F0B228;      --ouro-soft:#2E2208;   --ouro-line:#F0B228;
+    --chip:#152441;      --chip-ink:#B3C6E0;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+    --focus:#3EE6F5;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#070E22;      --surface:#0C1730;     --surface-2:#101F3F;
+  --line:#1E3157;        --line-soft:#182848;
+  --ink:#EAF3FF;         --ink-2:#B3C6E0;       --ink-3:#7F94B4;
+  --navy:#0A1432;
+  --accent:#3EE6F5;      --accent-soft:#0B2C3C; --accent-line:#00E0F0;
+  --ouro:#F0B228;        --ouro-soft:#2E2208;   --ouro-line:#F0B228;
+  --chip:#152441;        --chip-ink:#B3C6E0;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+  --focus:#3EE6F5;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--body); font-size:15px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+:focus-visible{outline:2px solid var(--focus); outline-offset:2px; border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+
+.wrap{max-width:1400px; margin:0 auto; padding:0 20px}
+
+/* ------------------------------------------------------------------- cabecalho */
+header{background:var(--navy); color:#EAF3FF; border-bottom:3px solid var(--accent-line)}
+.head{display:flex; align-items:center; gap:20px; flex-wrap:wrap; padding:18px 0 16px}
+.brand{display:flex; align-items:center; gap:14px; margin-right:auto}
+.mark{width:4px; height:42px; border-radius:2px;
+  background:linear-gradient(180deg,var(--accent-line) 0%,var(--accent-line) 55%,var(--ouro-line) 55%,var(--ouro-line) 100%)}
+h1{font-family:var(--display); font-weight:600; font-size:26px; letter-spacing:.01em; margin:0; color:#fff}
+h1 .x{color:var(--ouro-line); font-weight:400; padding:0 2px}
+.sub{font-size:12.5px; color:#9FB6D4; margin-top:2px; letter-spacing:.04em; text-transform:uppercase}
+.fontes{font-size:12px; color:#9FB6D4; text-align:right; line-height:1.65}
+.fontes b{color:#EAF3FF; font-weight:600}
+
+/* -------------------------------------------------------------------- aviso */
+.aviso{background:var(--ouro-soft); border-bottom:1px solid var(--ouro-line);
+  color:var(--ouro); font-size:13.5px}
+.aviso .wrap{display:flex; gap:12px; padding:11px 20px; align-items:baseline}
+.aviso strong{font-weight:650; letter-spacing:.02em}
+.aviso p{margin:0; color:var(--ink-2)}
+
+/* ------------------------------------------------------------------- numeros */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px;
+  background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden; margin:18px 0}
+.stat{background:var(--surface); padding:13px 16px}
+.stat .n{font-family:var(--display); font-size:25px; font-weight:600; color:var(--ink);
+  font-variant-numeric:tabular-nums; line-height:1.15}
+.stat .l{font-size:11.5px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.06em; margin-top:3px}
+
+/* ------------------------------------------------------------------ controles */
+.controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px}
+.busca{position:relative; flex:1 1 300px; min-width:240px}
+.busca svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--ink-3)}
+input[type=search]{width:100%; padding:10px 12px 10px 38px; font:inherit; color:var(--ink);
+  background:var(--surface); border:1px solid var(--line); border-radius:7px}
+input[type=search]::placeholder{color:var(--ink-3)}
+select,button{font:inherit; color:var(--ink); background:var(--surface);
+  border:1px solid var(--line); border-radius:7px; padding:10px 12px; cursor:pointer}
+label.sel{display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink-3);
+  text-transform:uppercase; letter-spacing:.05em}
+label.sel select{text-transform:none; letter-spacing:0; font-size:14px}
+.seg{display:inline-flex; border:1px solid var(--line); border-radius:7px; overflow:hidden; background:var(--surface)}
+.seg button{border:0; border-radius:0; padding:10px 15px; color:var(--ink-3); font-size:13.5px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed=true]{background:var(--accent-soft); color:var(--accent); font-weight:650}
+.check{display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--ink-2); cursor:pointer}
+button.acao{background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent); font-weight:600}
+
+/* --------------------------------------------------------------------- painel */
+.painel{display:grid; grid-template-columns:minmax(330px,390px) 1fr; gap:18px;
+  align-items:start; padding-bottom:60px}
+@media (max-width:900px){.painel{grid-template-columns:1fr}}
+
+.lista{background:var(--surface); border:1px solid var(--line); border-radius:9px;
+  box-shadow:var(--shadow); overflow:hidden; position:sticky; top:14px}
+@media (max-width:900px){.lista{position:static}}
+.lista h2{margin:0; padding:11px 15px; font-family:var(--display); font-size:12px; font-weight:600;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--ink-3);
+  border-bottom:1px solid var(--line); background:var(--surface-2)}
+.rolagem{max-height:min(70vh,760px); overflow-y:auto}
+@media (max-width:900px){.rolagem{max-height:420px}}
+
+.item{display:block; width:100%; text-align:left; background:none; border:0; border-radius:0;
+  border-bottom:1px solid var(--line-soft); padding:11px 15px; cursor:pointer}
+.item:hover{background:var(--surface-2)}
+.item[aria-current=true]{background:var(--accent-soft); box-shadow:inset 3px 0 0 var(--accent-line)}
+.item .nome{font-weight:640; font-size:14px; color:var(--ink); letter-spacing:.005em}
+.item .meta{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:4px;
+  font-size:12px; color:var(--ink-3)}
+.item .preco{font-variant-numeric:tabular-nums; color:var(--ink-2); font-weight:600}
+
+.tag{display:inline-block; padding:1px 7px; border-radius:20px; font-size:11px; font-weight:600;
+  letter-spacing:.03em; background:var(--chip); color:var(--chip-ink); white-space:nowrap}
+.tag.dut{background:var(--accent-soft); color:var(--accent)}
+.tag.rev{background:var(--ouro-soft); color:var(--ouro); border:1px solid var(--ouro-line)}
+.tag.hosp{background:var(--chip); color:var(--chip-ink)}
+
+/* -------------------------------------------------------------------- detalhe */
+.detalhe{background:var(--surface); border:1px solid var(--line); border-radius:9px;
+  box-shadow:var(--shadow); overflow:hidden; min-height:400px}
+.dtopo{padding:18px 22px 16px; border-bottom:1px solid var(--line); background:var(--surface-2)}
+.dtopo h2{margin:0; font-family:var(--display); font-size:23px; font-weight:600; letter-spacing:.01em;
+  text-wrap:balance; color:var(--ink)}
+.dtopo .classe{font-size:13px; color:var(--ink-3); margin-top:3px}
+.dchips{display:flex; gap:7px; flex-wrap:wrap; margin-top:11px}
+
+.faixa{display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr));
+  border-bottom:1px solid var(--line)}
+.faixa div{padding:13px 22px; border-right:1px solid var(--line-soft)}
+.faixa div:last-child{border-right:0}
+.faixa .v{font-family:var(--display); font-size:19px; font-weight:600; font-variant-numeric:tabular-nums;
+  color:var(--ink); line-height:1.2}
+.faixa .k{font-size:11px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.06em; margin-top:2px}
+
+section.bloco{padding:20px 22px; border-bottom:1px solid var(--line)}
+section.bloco:last-child{border-bottom:0}
+.rot{font-family:var(--display); font-size:11.5px; font-weight:600; text-transform:uppercase;
+  letter-spacing:.09em; color:var(--ink-3); margin:0 0 12px}
+
+.dut{border-left:2px solid var(--accent-line); padding:0 0 0 14px; margin-bottom:18px}
+.dut:last-child{margin-bottom:0}
+.dut .t{font-weight:640; font-size:14.5px; color:var(--ink); text-wrap:balance}
+.dut .n{font-family:var(--mono); font-size:12px; color:var(--accent); font-weight:600}
+.ev{margin:9px 0 0; padding:11px 13px; background:var(--surface-2); border-radius:6px;
+  font-size:13px; color:var(--ink-2); line-height:1.6}
+.ev + .ev{margin-top:7px}
+.rns{margin-top:9px; font-size:12px; color:var(--ink-3)}
+.rns b{color:var(--ink-2); font-weight:600}
+
+.tabwrap{overflow-x:auto; border:1px solid var(--line); border-radius:7px}
+table{border-collapse:collapse; width:100%; font-size:13px; min-width:720px}
+th{background:var(--surface-2); text-align:left; padding:9px 12px; font-size:11px; font-weight:650;
+  text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3);
+  border-bottom:1px solid var(--line); white-space:nowrap; position:sticky; top:0}
+td{padding:9px 12px; border-bottom:1px solid var(--line-soft); vertical-align:top}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td.num{text-align:right; font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap}
+td.apres{color:var(--ink-2); font-size:12.5px; max-width:320px}
+td.lab{color:var(--ink-2); font-size:12.5px}
+.nd{color:var(--ink-3); font-weight:400}
+
+.vazio{padding:60px 22px; text-align:center; color:var(--ink-3)}
+.vazio .g{font-family:var(--display); font-size:17px; color:var(--ink-2); margin-bottom:6px}
+
+footer{border-top:1px solid var(--line); background:var(--surface); color:var(--ink-3); font-size:12.5px}
+footer .wrap{padding:18px 20px; display:flex; gap:16px; flex-wrap:wrap; justify-content:space-between}
+</style>
+
+<header>
+  <div class="wrap head">
+    <div class="brand">
+      <div class="mark"></div>
+      <div>
+        <h1>Rol da ANS <span class="x">×</span> CMED</h1>
+        <div class="sub">Protótipo técnico · versão de trabalho</div>
+      </div>
+    </div>
+    <div class="fontes" id="fontes"></div>
+  </div>
+</header>
+
+<div class="aviso">
+  <div class="wrap">
+    <strong>Leia antes de usar</strong>
+    <p>Esta lista traz os medicamentos <b>citados nominalmente</b> no Anexo II da RN 465. Pela Lei 9.656/1998,
+       há medicamentos de cobertura obrigatória que não constam do Rol — a ausência aqui não significa
+       ausência de cobertura. A lista passou por revisão técnica, mas não substitui as fontes oficiais.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <div class="busca">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" id="q" placeholder="Buscar substância, produto, laboratório, classe ou diretriz"
+             aria-label="Buscar medicamento">
+    </div>
+    <div class="seg" role="group" aria-label="Base de preço">
+      <button id="bPF" aria-pressed="true">PF</button>
+      <button id="bPMC" aria-pressed="false">PMC</button>
+    </div>
+    <label class="sel">ICMS
+      <select id="aliq" aria-label="Alíquota de ICMS"></select>
+    </label>
+    <button class="acao" id="csv">Exportar CSV</button>
+  </div>
+
+  <div class="painel">
+    <div class="lista">
+      <h2 id="cont">Medicamentos</h2>
+      <div class="rolagem" id="lista" aria-label="Lista de medicamentos">
+        <div class="vazio">Carregando…</div>
+      </div>
+    </div>
+    <div class="detalhe" id="detalhe">
+      <div class="vazio"><div class="g">Carregando os dados…</div>
+        <div>Se esta mensagem não sair da tela, o navegador não conseguiu executar a página.
+             Abra o arquivo direto no Chrome, Safari ou Edge — visualizadores de nuvem e de
+             e-mail costumam bloquear páginas interativas.</div></div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <span id="rodape"></span>
+  <span>Protótipo para validação interna — não divulgar</span>
+</div></footer>
+
+<!-- diagnostico: script separado e em ES5, para sobreviver a um erro de sintaxe no script principal -->
+<script>
+window.addEventListener("error", function(e){
+  var el = document.getElementById("detalhe");
+  if (!el) return;
+  el.innerHTML = '<div class="vazio"><div class="g">Não foi possível carregar os dados</div>'
+    + '<div>A página abriu, mas o navegador não executou o script.<br>'
+    + 'Causas usuais: navegador desatualizado, ou arquivo aberto dentro de um visualizador '
+    + 'de nuvem/e-mail que bloqueia páginas interativas.</div>'
+    + '<div style="margin-top:14px;font-family:var(--mono);font-size:12px;opacity:.75">'
+    + (e.message || e.type) + '</div></div>';
+});
+</script>
+
+<script type="application/json" id="dados">__DADOS__</script>
+<script>
+"use strict";
+const D = JSON.parse(document.getElementById("dados").textContent);
+const meds = D.meds, ALIQ = D.aliq;
+
+const brl = v => v == null ? null :
+  v.toLocaleString("pt-BR", {style:"currency", currency:"BRL", minimumFractionDigits:2});
+const nd = '<span class="nd">—</span>';
+// evitar sintaxe pos-2015 (?? e ?.): em celular antigo um erro de sintaxe
+// derruba o script inteiro e a pagina abre sem nenhum dado
+const vazio = s => (s === null || s === undefined) ? "" : String(s);
+const esc = s => vazio(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let base = "pf", iAliq = 5, sel = null, filtrados = [];
+
+// ---------------------------------------------------------------- cabecalhos
+document.getElementById("fontes").innerHTML =
+  `<b>Rol:</b> ${esc(D.meta.rol)}<br><b>Preços:</b> ${esc(D.meta.cmed)}`;
+document.getElementById("rodape").textContent =
+  `Rol: ${D.meta.rol} · Preços: ${D.meta.cmed} · Cruzamento gerado em ${D.meta.gerado}.`;
+
+const nApres = meds.reduce((s,m) => s + m.na, 0);
+const nHosp  = meds.reduce((s,m) => s + m.nhosp, 0);
+document.getElementById("stats").innerHTML = [
+  [meds.length, "medicamentos no Rol"],
+  [nApres.toLocaleString("pt-BR"), "apresentações na CMED"],
+  [D.meta.n_duts, "diretrizes analisadas"],
+  [Math.round(nHosp/nApres*100) + "%", "com restrição hospitalar"],
+].map(([n,l]) => `<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+
+const selAliq = document.getElementById("aliq");
+selAliq.innerHTML = ALIQ.map((a,i) => `<option value="${i}"${i===5?" selected":""}>${esc(a)}</option>`).join("");
+
+// ------------------------------------------------------------------- filtros
+function precos(m){
+  const vs = m.ap.map(a => a[base][iAliq]).filter(v => v != null);
+  return vs.length ? {min:Math.min(...vs), max:Math.max(...vs), n:vs.length} : null;
+}
+
+function filtra(){
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  filtrados = meds.filter(m => {
+    if (!q) return true;
+    return m.s.toLowerCase().includes(q)
+        || (m.c||"").toLowerCase().includes(q)
+        || m.d.some(d => d.t.toLowerCase().includes(q) || d.n === q || ("dut " + d.n).startsWith(q))
+        || m.ap.some(a => (a.p||"").toLowerCase().includes(q) || (a.l||"").toLowerCase().includes(q));
+  });
+  desenhaLista();
+}
+
+function desenhaLista(){
+  document.getElementById("cont").textContent =
+    `${filtrados.length} medicamento${filtrados.length === 1 ? "" : "s"}`;
+  const el = document.getElementById("lista");
+  if (!filtrados.length){
+    el.innerHTML = `<div class="vazio"><div class="g">Nenhum resultado</div>
+      <div>Tente outro termo — substância, produto, laboratório ou número da diretriz.</div></div>`;
+    return;
+  }
+  el.innerHTML = filtrados.map(m => {
+    const p = precos(m);
+    const faixa = p ? (p.min === p.max ? brl(p.min) : `${brl(p.min)} – ${brl(p.max)}`)
+                    : `<span class="nd">sem ${base.toUpperCase()} publicado</span>`;
+    return `<button class="item" data-s="${esc(m.s)}" aria-current="${sel === m.s}">
+      <div class="nome">${esc(m.s)}</div>
+      <div class="meta">
+        ${m.d.slice(0,2).map(d => `<span class="tag dut">DUT ${esc(d.n)}</span>`).join("")}
+        ${m.d.length > 2 ? `<span class="tag">+${m.d.length-2}</span>` : ""}
+        ${m.tri === 1 ? '<span class="tag rev">verificar</span>' : ""}
+        <span>${m.na} apres.</span>
+      </div>
+      <div class="meta"><span class="preco">${faixa}</span></div>
+    </button>`;
+  }).join("");
+  el.querySelectorAll(".item").forEach(b =>
+    b.addEventListener("click", () => { sel = b.dataset.s; desenhaLista(); desenhaDetalhe(); }));
+}
+
+// ------------------------------------------------------------------- detalhe
+function desenhaDetalhe(){
+  const el = document.getElementById("detalhe");
+  const m = meds.find(x => x.s === sel);
+  if (!m){
+    el.innerHTML = `<div class="vazio"><div class="g">Selecione um medicamento</div>
+      <div>A ficha traz a diretriz que o inclui, o trecho literal do Rol e todas as apresentações com preço.</div></div>`;
+    return;
+  }
+  const p = precos(m), rot = base === "pf" ? "PF" : "PMC", al = ALIQ[iAliq];
+
+  const chips = [
+    ...m.tp.map(t => `<span class="tag">${esc(t)}</span>`),
+    m.nhosp ? `<span class="tag hosp">${m.nhosp === m.na ? "Uso restrito a hospitais" : `${m.nhosp} de ${m.na} com restrição hospitalar`}</span>` : "",
+    m.tri === 1 ? '<span class="tag rev">a verificar na curadoria</span>' : "",
+  ].filter(Boolean).join("");
+
+  const faixa = `
+    <div class="faixa">
+      <div><div class="v">${p ? brl(p.min) : nd}</div><div class="k">${rot} mínimo · ICMS ${esc(al)}</div></div>
+      <div><div class="v">${p ? brl(p.max) : nd}</div><div class="k">${rot} máximo</div></div>
+      <div><div class="v">${m.na}</div><div class="k">apresentações</div></div>
+      <div><div class="v">${m.nl}</div><div class="k">laboratórios</div></div>
+    </div>`;
+
+  const duts = m.d.map(d => `
+    <div class="dut">
+      <div class="n">DUT ${esc(d.n)}</div>
+      <div class="t">${esc(d.t)}</div>
+      ${d.ev.map(e => `<p class="ev">${esc(e)}</p>`).join("")}
+    </div>`).join("");
+
+  const linhas = m.ap.map(a => {
+    const v = a[base][iAliq];
+    return `<tr>
+      <td>${esc(a.p)}</td>
+      <td class="apres">${esc(a.a)}</td>
+      <td class="lab">${esc(a.l)}</td>
+      <td>${a.h && a.h.toLowerCase().startsWith("s") ? '<span class="tag hosp">hospitalar</span>' : ""}</td>
+      <td class="num">${v != null ? brl(v) : nd}</td>
+    </tr>`;
+  }).join("");
+
+  const semPMC = base === "pmc" && !p;
+  el.innerHTML = `
+    <div class="dtopo">
+      <h2>${esc(m.s)}</h2>
+      <div class="classe">${esc(m.c) || "sem classe terapêutica informada"}</div>
+      <div class="dchips">${chips}</div>
+    </div>
+    ${faixa}
+    <section class="bloco">
+      <h3 class="rot">Por que consta do Rol</h3>
+      ${duts}
+      ${m.rns.length ? `<div class="rns"><b>RNs citadas na diretriz:</b> ${esc(m.rns.join(" · "))}
+        <br><span style="opacity:.8">Inclui todas as RNs mencionadas na diretriz, não apenas a que incluiu este medicamento.</span></div>` : ""}
+    </section>
+    <section class="bloco">
+      <h3 class="rot">Apresentações e preços — ${rot} com ICMS ${esc(al)}</h3>
+      ${semPMC ? `<p class="ev" style="margin:0 0 12px">A CMED omite o PMC das apresentações em embalagem
+        hospitalar e de uso restrito a hospitais e clínicas (Resolução CMED 03/2009). Para este medicamento,
+        use o PF — que é o teto de venda às operadoras e à Administração Pública.</p>` : ""}
+      <div class="tabwrap"><table>
+        <thead><tr><th>Produto</th><th>Apresentação</th><th>Laboratório</th><th></th>
+          <th style="text-align:right">${rot} ${esc(al)}</th></tr></thead>
+        <tbody>${linhas}</tbody>
+      </table></div>
+    </section>`;
+}
+
+// --------------------------------------------------------------------- eventos
+document.getElementById("q").addEventListener("input", filtra);
+selAliq.addEventListener("change", e => { iAliq = +e.target.value; desenhaLista(); desenhaDetalhe(); });
+for (const [id, v] of [["bPF","pf"], ["bPMC","pmc"]]){
+  document.getElementById(id).addEventListener("click", () => {
+    base = v;
+    document.getElementById("bPF").setAttribute("aria-pressed", v === "pf");
+    document.getElementById("bPMC").setAttribute("aria-pressed", v === "pmc");
+    desenhaLista(); desenhaDetalhe();
+  });
+}
+document.getElementById("csv").addEventListener("click", () => {
+  const cab = ["SUBSTANCIA","TRIAGEM","DUTs","DIRETRIZES","CLASSE","PRODUTO","APRESENTACAO",
+               "LABORATORIO","RESTRICAO_HOSPITALAR","BASE","ALIQUOTA_ICMS","VALOR"];
+  const linhas = [cab];
+  for (const m of filtrados)
+    for (const a of m.ap)
+      linhas.push([m.s, m.tri ? "verificar" : "provavel medicamento",
+        m.d.map(d => d.n).join(" "), m.d.map(d => d.t).join(" | "), m.c,
+        a.p, a.a, a.l, a.h, base.toUpperCase(), ALIQ[iAliq],
+        a[base][iAliq] != null ? String(a[base][iAliq]).replace(".", ",") : ""]);
+  const csv = "﻿" + linhas.map(l =>   // BOM: o Excel abre o CSV em UTF-8
+    l.map(c => `"${vazio(c).replace(/"/g,'""')}"`).join(";")).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
+  a.download = "rol-ans-cmed.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+filtra();
+desenhaDetalhe();
+</script>

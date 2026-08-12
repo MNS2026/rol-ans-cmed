@@ -35,5 +35,33 @@ de venda às operadoras e à Administração Pública.
 `index.html` é um arquivo único e autônomo: os dados vêm embutidos nele. Abre em qualquer navegador,
 inclusive sem internet. Não depende de servidor nem de banco de dados.
 
-Os scripts que geram os dados (download da CMED, leitura do Anexo II e cruzamento) estão na pasta
-do projeto e serão incorporados ao repositório quando a atualização automática for implantada.
+## Atualização automática
+
+Todo dia às 8h (Brasília), o robô verifica as duas fontes oficiais e republica **apenas se algo mudou**:
+
+1. Descobre a lista de preços vigente no portal da CMED
+2. Descobre o Anexo II vigente na página de atualização do Rol da ANS — o nome do arquivo
+   carrega a RN em vigor (`..._RN676.2026.pdf`), então uma norma nova é detectada de imediato
+3. Extrai as diretrizes, cruza com as substâncias da CMED e aplica a curadoria
+4. Regera `index.html` e publica
+
+**Medicamento novo não entra sozinho.** Se o Rol passar a citar uma substância que ainda não foi
+analisada, ela fica de fora e o robô abre uma *issue* avisando. O critério de inclusão continua sendo
+humano — o robô só cuida do trabalho repetitivo.
+
+### Arquivos
+
+| Caminho | O que é |
+|---|---|
+| `index.html` | a ferramenta (gerado — não editar à mão) |
+| `dados/curadoria.csv` | decisões da revisão técnica: `CONFIRMA` ou `EXCLUI` por substância |
+| `dados/estado.json` | qual CMED e qual RN foram processadas por último |
+| `scripts/pipeline.py` | o robô |
+| `scripts/template.html` | o código da interface |
+
+### Rodar na mão
+
+Pela aba **Actions** → *Atualizar Rol e preços* → **Run workflow**. Marque *Reprocessar mesmo sem
+mudança nas fontes* para forçar a regeração.
+
+Localmente: `pip install -r scripts/requirements.txt && python scripts/pipeline.py`

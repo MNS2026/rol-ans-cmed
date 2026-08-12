@@ -1,0 +1,108 @@
+name: Atualizar Rol e preços
+
+on:
+  schedule:
+    # 11:00 UTC = 08:00 em Brasília. A CMED costuma publicar no fim do dia anterior.
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+    inputs:
+      forcar:
+        description: "Reprocessar mesmo sem mudança nas fontes"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: atualizar
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+
+      - run: pip install -r scripts/requirements.txt
+
+      - name: Verificar fontes e regerar
+        id: pipeline
+        env:
+          FORCAR: ${{ inputs.forcar && '1' || '0' }}
+        run: |
+          export DATA_HOJE="$(TZ=America/Sao_Paulo date +%d/%m/%Y)"
+          python scripts/pipeline.py
+
+      - name: Publicar
+        if: steps.pipeline.outputs.mudou == 'sim'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html dados/estado.json
+          if git diff --staged --quiet; then
+            echo "Fontes mudaram, mas o resultado ficou igual. Nada a publicar."
+            exit 0
+          fi
+          git commit -m "Atualiza dados: RN ${{ steps.pipeline.outputs.rn }} | ${{ steps.pipeline.outputs.cmed }}
+
+          ${{ steps.pipeline.outputs.medicamentos }} medicamentos. Gerado automaticamente."
+          git push
+
+      - name: Avisar sobre medicamento novo no Rol
+        if: steps.pipeline.outputs.pendentes != '0' && steps.pipeline.outputs.pendentes != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Curadoria pendente: ${{ steps.pipeline.outputs.pendentes }} medicamento(s) novo(s) no Rol" \
+            --body "O Rol foi atualizado (RN ${{ steps.pipeline.outputs.rn }}) e apareceram substâncias que ainda não passaram por revisão técnica.
+
+          **Pendentes:** ${{ steps.pipeline.outputs.lista_pendentes }}
+
+          Elas **não entraram** na ferramenta — o site segue no ar com a lista anterior. Para incluí-las, decida cada uma e registre em \`dados/curadoria.csv\` (coluna \`decisao\`: \`CONFIRMA\` ou \`EXCLUI\`).
+
+          Depois, rode o workflow manualmente marcando *Reprocessar mesmo sem mudança nas fontes*.
+
+          [Ver execução](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+
+      - name: Avisar quando o Rol mudar
+        if: steps.pipeline.outputs.mudou_rol == 'sim'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Rol atualizado: RN ${{ steps.pipeline.outputs.rn }}" \
+            --body "A ANS publicou uma nova versão do Anexo II do Rol.
+
+          **RN vigente:** ${{ steps.pipeline.outputs.rn }}
+          **Medicamentos na ferramenta:** ${{ steps.pipeline.outputs.medicamentos }}
+          **Pendentes de curadoria:** ${{ steps.pipeline.outputs.pendentes }}
+
+          Vale conferir o que mudou na norma — este é o aviso de que há RN nova, não uma análise do conteúdo dela.
+
+          [Ver execução](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+
+      - name: Resumo
+        if: always()
+        run: |
+          {
+            echo "### Execução de $(TZ=America/Sao_Paulo date +'%d/%m/%Y %H:%M')"
+            echo ""
+            if [ "${{ steps.pipeline.outputs.mudou }}" = "sim" ]; then
+              echo "- Fontes mudaram — ferramenta republicada"
+              echo "- Rol: RN ${{ steps.pipeline.outputs.rn }}"
+              echo "- Preços: ${{ steps.pipeline.outputs.cmed }}"
+              echo "- Medicamentos: ${{ steps.pipeline.outputs.medicamentos }}"
+              echo "- Pendentes de curadoria: ${{ steps.pipeline.outputs.pendentes }}"
+            else
+              echo "- Nada mudou nas fontes. Nenhuma republicação."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
