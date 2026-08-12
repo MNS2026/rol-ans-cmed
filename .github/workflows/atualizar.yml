@@ -62,6 +62,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh issue create \
+            --assignee "${{ github.repository_owner }}" \
             --title "Curadoria pendente: ${{ steps.pipeline.outputs.pendentes }} medicamento(s) novo(s) no Rol" \
             --body "O Rol foi atualizado (RN ${{ steps.pipeline.outputs.rn }}) e apareceram substâncias que ainda não passaram por revisão técnica.
 
@@ -73,12 +74,33 @@ jobs:
 
           [Ver execução](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
 
+      - name: Avisar quando a CMED publicar nova lista
+        if: steps.pipeline.outputs.mudou_cmed == 'sim' && steps.pipeline.outputs.mudou_rol == 'nao'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --assignee "${{ github.repository_owner }}" \
+            --title "Preços atualizados: ${{ steps.pipeline.outputs.cmed }}" \
+            --body "A Anvisa publicou uma nova lista de preços da CMED e a ferramenta já foi republicada.
+
+          **Lista anterior:** ${{ steps.pipeline.outputs.cmed_anterior }}
+          **Lista atual:** ${{ steps.pipeline.outputs.cmed }}
+          **Medicamentos:** ${{ steps.pipeline.outputs.medicamentos }} — ${{ steps.pipeline.outputs.apresentacoes }} apresentações
+
+          Nenhuma ação necessária. Este aviso é informativo: o Rol não mudou, apenas os preços.
+
+          https://MNS2026.github.io/rol-ans-cmed/
+
+          [Ver execução](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+
       - name: Avisar quando o Rol mudar
         if: steps.pipeline.outputs.mudou_rol == 'sim'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh issue create \
+            --assignee "${{ github.repository_owner }}" \
             --title "Rol atualizado: RN ${{ steps.pipeline.outputs.rn }}" \
             --body "A ANS publicou uma nova versão do Anexo II do Rol.
 

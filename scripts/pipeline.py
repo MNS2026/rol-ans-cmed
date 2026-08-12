@@ -348,6 +348,9 @@ def main():
     saida_workflow("pendentes", len(pendentes))
     saida_workflow("lista_pendentes", ", ".join(pendentes))
     saida_workflow("mudou_rol", "sim" if mudou_rol else "nao")
+    saida_workflow("mudou_cmed", "sim" if mudou_cmed else "nao")
+    saida_workflow("cmed_anterior", estado.get("cmed_publicada", "primeira execução"))
+    saida_workflow("apresentacoes", n_ap)
     return 0
 
 if __name__ == "__main__":
