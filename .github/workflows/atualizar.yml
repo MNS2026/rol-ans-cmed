@@ -56,6 +56,26 @@ jobs:
           ${{ steps.pipeline.outputs.medicamentos }} medicamentos. Gerado automaticamente."
           git push
 
+      - name: Manter o agendamento vivo
+        if: steps.pipeline.outputs.mudou == 'nao'
+        run: |
+          # O GitHub desliga workflows agendados após 60 dias sem alteração no
+          # repositório. Em período longo sem mudança nas fontes, o robô não
+          # commita nada e se desligaria sozinho. Este registro evita isso.
+          DIAS=$(( ( $(date +%s) - $(git log -1 --format=%ct) ) / 86400 ))
+          echo "Dias desde a última alteração: $DIAS"
+          if [ "$DIAS" -ge 30 ]; then
+            TZ=America/Sao_Paulo date +"%d/%m/%Y %H:%M" > dados/ultima-verificacao.txt
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add dados/ultima-verificacao.txt
+            git commit -m "Registro de atividade — mantém o agendamento ativo"
+            git push
+            echo "Registro gravado."
+          else
+            echo "Sem necessidade de registro."
+          fi
+
       - name: Avisar sobre medicamento novo no Rol
         if: steps.pipeline.outputs.pendentes != '0' && steps.pipeline.outputs.pendentes != ''
         env:
