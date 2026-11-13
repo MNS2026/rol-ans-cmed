@@ -132,6 +132,30 @@ jobs:
 
           [Ver execução](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
 
+      - name: Avisar se o robô falhar
+        # Em set-nov/2026 o robô falhou por 6 semanas sem ninguém notar (a Anvisa
+        # renomeou o arquivo da CMED). Agora a falha vira issue, no mesmo canal
+        # dos demais avisos — e só uma: não abre outra enquanto a anterior estiver aberta.
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITULO="O robô falhou — a ferramenta parou de se atualizar"
+          if gh issue list --state open --search "in:title \"$TITULO\"" --json number --jq 'length' | grep -qv '^0$'; then
+            echo "Já existe aviso de falha aberto. Não abro outro."
+            exit 0
+          fi
+          gh issue create \
+            --assignee "${{ github.repository_owner }}" \
+            --title "$TITULO" \
+            --body "A verificação diária falhou em $(TZ=America/Sao_Paulo date +%d/%m/%Y). O site continua no ar, mas **com os dados da última atualização bem-sucedida**.
+
+          Causa mais provável: a Anvisa ou a ANS mudaram o formato da página ou do arquivo (já aconteceu em set/2026 com a CMED). O detalhe do erro está na execução abaixo.
+
+          Feche esta issue depois de corrigir — enquanto ela estiver aberta, novas falhas não geram novo aviso.
+
+          [Ver execução](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+
       - name: Resumo
         if: always()
         run: |

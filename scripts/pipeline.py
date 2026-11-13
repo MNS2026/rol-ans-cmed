@@ -40,11 +40,17 @@ def pagina(url):
 
 # ----------------------------------------------------------------- descoberta
 def descobre_cmed():
-    """A pagina da CMED traz o link do arquivo vigente embutido no HTML."""
-    achados = sorted(set(re.findall(r"xls_conformidade_site_\d{8}_\d+\.xlsx", pagina(PAG_CMED))))
+    """A pagina da CMED traz o link do arquivo vigente embutido no HTML.
+
+    O nome do arquivo ja mudou uma vez (set/2026: xls_conformidade_site_* -> lista_pmc_*).
+    Aceita os dois padroes e escolhe o mais recente pela data no nome, nao pela ordem alfabetica.
+    A lista PMVG (lista_pmvg_*) e outra tabela e fica de fora de proposito."""
+    padrao_arq = r"(?:lista_pmc|xls_conformidade_site)_(\d{8})_\d+\.xlsx"
+    achados = {m.group(0): m.group(1) for m in re.finditer(padrao_arq, pagina(PAG_CMED))}
     if not achados:
-        raise RuntimeError("nao encontrei a lista de precos na pagina da CMED")
-    arq = achados[-1]
+        raise RuntimeError("nao encontrei a lista de precos na pagina da CMED "
+                           "(a Anvisa pode ter mudado de novo o nome do arquivo)")
+    arq = max(achados, key=lambda a: (achados[a], a))
     url = f"{PAG_CMED}/arquivos/{arq}/@@download/file"
     return arq, url
 
@@ -152,22 +158,59 @@ def num(v):
     except ValueError:
         return None
 
+def _chave_col(c):
+    return re.sub(r"\s+", "", norm(c or ""))
+
+def _mapeia_colunas(cab):
+    """Localiza as colunas pelo NOME do cabecalho, nao pela posicao, e valida.
+    Se a Anvisa mudar a planilha, o robo para com mensagem clara em vez de
+    publicar precos na coluna errada."""
+    global COL, PF_COLS, PMC_COLS
+    pos = {}
+    for i, c in enumerate(cab):
+        pos.setdefault(_chave_col(c), i)
+    def acha(*nomes, prefixo=False):
+        for n in nomes:
+            k = _chave_col(n)
+            if k in pos:
+                return pos[k]
+            if prefixo:
+                for kk, i in pos.items():
+                    if kk.startswith(k):
+                        return i
+        raise RuntimeError(f"coluna '{nomes[0]}' nao encontrada na planilha da CMED")
+    COL = {"SUB": acha("SUBSTÂNCIA"), "LAB": acha("LABORATÓRIO"), "GGREM": acha("CÓDIGO GGREM"),
+           "REG": acha("REGISTRO"), "PROD": acha("PRODUTO"), "APRES": acha("APRESENTAÇÃO"),
+           "CLASSE": acha("CLASSE TERAPÊUTICA"), "TIPO": acha("TIPO DE PRODUTO", prefixo=True),
+           "REGIME": acha("REGIME DE PREÇO"), "HOSP": acha("RESTRIÇÃO HOSPITALAR"),
+           "TARJA": acha("TARJA")}
+    PF_COLS = [acha(f"PF {a}") for a in ALIQ]
+    PMC_COLS = [acha(f"PMC {a}") for a in ALIQ]
+    COL["PF"], COL["PMC"] = PF_COLS[0], PMC_COLS[0]
+
 def carrega_cmed(caminho):
+    """Procura em todas as abas a linha de cabecalho (1a celula = SUBSTANCIA) e a data
+    de publicacao. Ate ago/2026 era uma aba so, cabecalho na linha 42; desde set/2026
+    a data fica na aba 'Cabecalho' e os dados na aba 'Lista PMC', cabecalho na linha 1."""
     import openpyxl
     wb = openpyxl.load_workbook(caminho, read_only=True, data_only=True)
-    ws = wb.active
-    pub = ""
-    for i, row in enumerate(ws.iter_rows(min_row=1, max_row=5, values_only=True)):
-        for c in row:
-            if c and "Publicada em" in str(c):
-                pub = str(c).strip()
-    it = ws.iter_rows(min_row=42, values_only=True)
-    next(it)
+    pub, ws_dados, linha_cab = "", None, None
+    for ws in wb.worksheets:
+        for i, row in enumerate(ws.iter_rows(min_row=1, max_row=60, values_only=True), 1):
+            for c in row:
+                if not pub and c and "Publicada em" in str(c):
+                    pub = str(c).strip()
+            if ws_dados is None and row and row[0] and norm(row[0]) == "SUBSTANCIA":
+                ws_dados, linha_cab = ws, i
+    if ws_dados is None:
+        raise RuntimeError("nao encontrei a linha de cabecalho (SUBSTANCIA) na planilha da CMED")
+    it = ws_dados.iter_rows(min_row=linha_cab, values_only=True)
+    _mapeia_colunas(next(it))
     idx = collections.defaultdict(list)
     for r in it:
-        if not r or not r[0]:
+        if not r or not r[COL["SUB"]]:
             continue
-        for parte in str(r[0]).split(";"):
+        for parte in str(r[COL["SUB"]]).split(";"):
             s = norm(parte)
             if len(s) >= 5:
                 idx[s].append(r)
